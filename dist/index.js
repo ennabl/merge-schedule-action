@@ -9835,7 +9835,6 @@ async function handleSchedule() {
         state: "open",
     }, (response) => {
         const responseData = response.data;
-        console.info(responseData);
         return responseData
             .filter((pullRequest) => !(0, utils_1.isFork)(pullRequest))
             .filter((pullRequest) => (0, utils_1.findScheduleDateCommand)(pullRequest.number, octokit))
