@@ -10,6 +10,11 @@ Create `.github/workflows/merge-schedule.yml`
 name: Merge Schedule
 
 on:
+  issue_comment:
+    types:
+      - created
+      - edited
+      - deleted
   pull_request:
     types:
       - opened
@@ -22,8 +27,9 @@ on:
 jobs:
   merge_schedule:
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
-      - uses: gr2m/merge-schedule-action@v2
+      - uses: ennabl/merge-schedule-action@master
         with:
           # Merge method to use. Possible values are merge, squash or
           # rebase. Default is merge.
@@ -40,7 +46,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-In your pull requests, add a line to the end of the pull request description looking like this
+In your pull requests, add a line to the end of the pull request description (or a comment) looking like this
 
 ```
 /schedule 2022-06-08

@@ -3,11 +3,14 @@
   "private": true,
   "version": "2.4.3",
   "description": "GitHub Action to merge pull requests on a scheduled day",
-  "repository": "github:gr2m/merge-schedule-action",
+  "repository": "github:ennabl/merge-schedule-action",
   "keywords": [
     "github-action"
   ],
   "author": "Gregor Martynus (https://twitter.com/gr2m)",
+  "contributors": [
+    "Urmat Zhenaliev (https://github.com/anuri73)"
+  ],
   "license": "ISC",
   "scripts": {
     "prebuild": "npx rimraf dist",

@@ -31,7 +31,7 @@ describe("handlePullRequest", () => {
 
     expect(mockStdout.mock.calls).toEqual([
       [
-        "Handling pull request closed for https://github.com/gr2m/merge-schedule-action/pull/2\n",
+        "Handling pull request closed for https://github.com/ennabl/merge-schedule-action/pull/2\n",
       ],
       ["Pull request already closed, ignoring\n"],
     ]);
@@ -46,7 +46,7 @@ describe("handlePullRequest", () => {
 
     expect(mockStdout.mock.calls).toEqual([
       [
-        "Handling pull request opened for https://github.com/gr2m/merge-schedule-action/pull/2\n",
+        "Handling pull request opened for https://github.com/ennabl/merge-schedule-action/pull/2\n",
       ],
       ["::error::Setting a scheduled merge is not allowed from forks\n"],
     ]);
@@ -61,7 +61,7 @@ describe("handlePullRequest", () => {
 
     expect(mockStdout.mock.calls).toEqual([
       [
-        "Handling pull request opened for https://github.com/gr2m/merge-schedule-action/pull/2\n",
+        "Handling pull request opened for https://github.com/ennabl/merge-schedule-action/pull/2\n",
       ],
       ["No /schedule command found\n"],
     ]);
@@ -76,7 +76,7 @@ describe("handlePullRequest", () => {
 
     expect(mockStdout.mock.calls).toEqual([
       [
-        "Handling pull request opened for https://github.com/gr2m/merge-schedule-action/pull/3\n",
+        "Handling pull request opened for https://github.com/ennabl/merge-schedule-action/pull/3\n",
       ],
       ["No /schedule command found\n"],
     ]);
@@ -94,11 +94,11 @@ describe("handlePullRequest", () => {
 
     expect(mockStdout.mock.calls).toEqual([
       [
-        "Handling pull request opened for https://github.com/gr2m/merge-schedule-action/pull/2\n",
+        "Handling pull request opened for https://github.com/ennabl/merge-schedule-action/pull/2\n",
       ],
       [`Schedule date found: "bad-date"\n`],
       [
-        `Comment created: https://github.com/gr2m/merge-schedule-action/issues/2#issuecomment-22\n`,
+        `Comment created: https://github.com/ennabl/merge-schedule-action/issues/2#issuecomment-22\n`,
       ],
     ]);
     expect(createComment.mock.calls).toHaveLength(1);
@@ -121,11 +121,11 @@ describe("handlePullRequest", () => {
 
     expect(mockStdout.mock.calls).toEqual([
       [
-        "Handling pull request opened for https://github.com/gr2m/merge-schedule-action/pull/2\n",
+        "Handling pull request opened for https://github.com/ennabl/merge-schedule-action/pull/2\n",
       ],
       [`Schedule date found: "2022-06-08"\n`],
       [
-        `Comment created: https://github.com/gr2m/merge-schedule-action/issues/2#issuecomment-22\n`,
+        `Comment created: https://github.com/ennabl/merge-schedule-action/issues/2#issuecomment-22\n`,
       ],
     ]);
     expect(createComment.mock.calls).toHaveLength(1);
@@ -149,11 +149,11 @@ describe("handlePullRequest", () => {
 
     expect(mockStdout.mock.calls).toEqual([
       [
-        "Handling pull request opened for https://github.com/gr2m/merge-schedule-action/pull/2\n",
+        "Handling pull request opened for https://github.com/ennabl/merge-schedule-action/pull/2\n",
       ],
       [`Schedule date found: "2022-06-08"\n`],
       [
-        `Comment created: https://github.com/gr2m/merge-schedule-action/issues/2#issuecomment-22\n`,
+        `Comment created: https://github.com/ennabl/merge-schedule-action/issues/2#issuecomment-22\n`,
       ],
     ]);
     expect(createComment.mock.calls).toHaveLength(1);
@@ -176,11 +176,11 @@ describe("handlePullRequest", () => {
 
     expect(mockStdout.mock.calls).toEqual([
       [
-        "Handling pull request opened for https://github.com/gr2m/merge-schedule-action/pull/2\n",
+        "Handling pull request opened for https://github.com/ennabl/merge-schedule-action/pull/2\n",
       ],
       [`Schedule date found: "2022-06-12"\n`],
       [
-        `Comment created: https://github.com/gr2m/merge-schedule-action/issues/2#issuecomment-22\n`,
+        `Comment created: https://github.com/ennabl/merge-schedule-action/issues/2#issuecomment-22\n`,
       ],
     ]);
     expect(createComment.mock.calls).toHaveLength(1);
@@ -204,11 +204,11 @@ describe("handlePullRequest", () => {
 
     expect(mockStdout.mock.calls).toEqual([
       [
-        "Handling pull request opened for https://github.com/gr2m/merge-schedule-action/pull/3\n",
+        "Handling pull request opened for https://github.com/ennabl/merge-schedule-action/pull/3\n",
       ],
       [`Schedule date found: "2022-06-12"\n`],
       [
-        `Comment updated: https://github.com/gr2m/merge-schedule-action/issues/3#issuecomment-31\n`,
+        `Comment updated: https://github.com/ennabl/merge-schedule-action/issues/3#issuecomment-31\n`,
       ],
     ]);
     expect(updateComment.mock.calls).toHaveLength(1);
@@ -232,7 +232,7 @@ describe("handlePullRequest", () => {
 
     expect(mockStdout.mock.calls).toEqual([
       [
-        "Handling pull request opened for https://github.com/gr2m/merge-schedule-action/pull/4\n",
+        "Handling pull request opened for https://github.com/ennabl/merge-schedule-action/pull/4\n",
       ],
       [`Schedule date found: "2022-06-12"\n`],
       ["Comment already up to date\n"],
@@ -252,10 +252,10 @@ describe("handlePullRequest", () => {
 
     expect(mockStdout.mock.calls).toEqual([
       [
-        "Handling pull request opened for https://github.com/gr2m/merge-schedule-action/pull/2\n",
+        "Handling pull request opened for https://github.com/ennabl/merge-schedule-action/pull/2\n",
       ],
       [
-        `Comment created: https://github.com/gr2m/merge-schedule-action/issues/2#issuecomment-22\n`,
+        `Comment created: https://github.com/ennabl/merge-schedule-action/issues/2#issuecomment-22\n`,
       ],
     ]);
     expect(createComment.mock.calls).toHaveLength(1);

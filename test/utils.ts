@@ -29,7 +29,7 @@ export function generatePullRequestWebhook({
   const payload = {
     action: state === "closed" ? "closed" : "opened",
     pull_request: {
-      html_url: `https://github.com/gr2m/merge-schedule-action/pull/${number}`,
+      html_url: `https://github.com/ennabl/merge-schedule-action/pull/${number}`,
       number,
       state,
       body,

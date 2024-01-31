@@ -35,29 +35,29 @@ describe("handleSchedule", () => {
       [`Loading open pull requests\n`],
       [`7 scheduled pull requests found\n`],
       [`6 due pull requests found\n`],
-      [`https://github.com/gr2m/merge-schedule-action/pull/2 merged\n`],
+      [`https://github.com/ennabl/merge-schedule-action/pull/2 merged\n`],
       [
-        `Comment created: https://github.com/gr2m/merge-schedule-action/issues/2#issuecomment-22\n`,
+        `Comment created: https://github.com/ennabl/merge-schedule-action/issues/2#issuecomment-22\n`,
       ],
-      [`https://github.com/gr2m/merge-schedule-action/pull/3 merged\n`],
+      [`https://github.com/ennabl/merge-schedule-action/pull/3 merged\n`],
       [
-        `Comment updated: https://github.com/gr2m/merge-schedule-action/issues/3#issuecomment-31\n`,
+        `Comment updated: https://github.com/ennabl/merge-schedule-action/issues/3#issuecomment-31\n`,
       ],
       [
-        `Comment created: https://github.com/gr2m/merge-schedule-action/issues/13#issuecomment-132\n`,
-      ],
-      [`Label added: "automerge-fail"\n`],
-      [
-        `Comment updated: https://github.com/gr2m/merge-schedule-action/issues/6#issuecomment-61\n`,
+        `Comment created: https://github.com/ennabl/merge-schedule-action/issues/13#issuecomment-132\n`,
       ],
       [`Label added: "automerge-fail"\n`],
-      [`https://github.com/gr2m/merge-schedule-action/pull/7 merged\n`],
       [
-        `Comment created: https://github.com/gr2m/merge-schedule-action/issues/7#issuecomment-72\n`,
+        `Comment updated: https://github.com/ennabl/merge-schedule-action/issues/6#issuecomment-61\n`,
       ],
-      [`https://github.com/gr2m/merge-schedule-action/pull/14 merged\n`],
+      [`Label added: "automerge-fail"\n`],
+      [`https://github.com/ennabl/merge-schedule-action/pull/7 merged\n`],
       [
-        `Comment created: https://github.com/gr2m/merge-schedule-action/issues/14#issuecomment-142\n`,
+        `Comment created: https://github.com/ennabl/merge-schedule-action/issues/7#issuecomment-72\n`,
+      ],
+      [`https://github.com/ennabl/merge-schedule-action/pull/14 merged\n`],
+      [
+        `Comment created: https://github.com/ennabl/merge-schedule-action/issues/14#issuecomment-142\n`,
       ],
     ]);
     expect(createComment.mock.calls).toHaveLength(4);
@@ -103,28 +103,28 @@ describe("handleSchedule", () => {
       [`Loading open pull requests\n`],
       [`7 scheduled pull requests found\n`],
       [`6 due pull requests found\n`],
-      [`https://github.com/gr2m/merge-schedule-action/pull/2 merged\n`],
+      [`https://github.com/ennabl/merge-schedule-action/pull/2 merged\n`],
       [
-        `Comment created: https://github.com/gr2m/merge-schedule-action/issues/2#issuecomment-22\n`,
+        `Comment created: https://github.com/ennabl/merge-schedule-action/issues/2#issuecomment-22\n`,
       ],
       [
-        `https://github.com/gr2m/merge-schedule-action/pull/3 is not ready to be merged yet because all checks are not completed or statuses are not success\n`,
+        `https://github.com/ennabl/merge-schedule-action/pull/3 is not ready to be merged yet because all checks are not completed or statuses are not success\n`,
       ],
       [
-        `Comment created: https://github.com/gr2m/merge-schedule-action/issues/13#issuecomment-132\n`,
-      ],
-      [`Label added: "automerge-fail"\n`],
-      [
-        `Comment updated: https://github.com/gr2m/merge-schedule-action/issues/6#issuecomment-61\n`,
+        `Comment created: https://github.com/ennabl/merge-schedule-action/issues/13#issuecomment-132\n`,
       ],
       [`Label added: "automerge-fail"\n`],
-      [`https://github.com/gr2m/merge-schedule-action/pull/7 merged\n`],
       [
-        `Comment created: https://github.com/gr2m/merge-schedule-action/issues/7#issuecomment-72\n`,
+        `Comment updated: https://github.com/ennabl/merge-schedule-action/issues/6#issuecomment-61\n`,
       ],
-      [`https://github.com/gr2m/merge-schedule-action/pull/14 merged\n`],
+      [`Label added: "automerge-fail"\n`],
+      [`https://github.com/ennabl/merge-schedule-action/pull/7 merged\n`],
       [
-        `Comment created: https://github.com/gr2m/merge-schedule-action/issues/14#issuecomment-142\n`,
+        `Comment created: https://github.com/ennabl/merge-schedule-action/issues/7#issuecomment-72\n`,
+      ],
+      [`https://github.com/ennabl/merge-schedule-action/pull/14 merged\n`],
+      [
+        `Comment created: https://github.com/ennabl/merge-schedule-action/issues/14#issuecomment-142\n`,
       ],
     ]);
     expect(createComment.mock.calls).toHaveLength(4);

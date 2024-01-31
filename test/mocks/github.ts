@@ -22,7 +22,7 @@ type CommitStatusesPathParams = BasePathParams & {
 };
 
 const githubUrl = (path: string) => `https://api.github.com${path}`;
-const owner = "gr2m";
+const owner = "ennabl";
 const repo = "merge-schedule-action";
 const githubPullRequestUrl = (id: number) =>
   `https://github.com/${owner}/${repo}/pull/${id}`;
