@@ -2,14 +2,11 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 import {readFileSync} from "fs";
 import localeDate from "./locale-date";
-import type {
-    PullRequestEvent,
-    SimplePullRequest,
+import {
+    IssueCommentEvent,
 } from "@octokit/webhooks-types";
 import {
-    getScheduleDateString,
     findScheduleDateCommand,
-    isFork,
     isValidDate,
     stringifyDate,
 } from "./utils";
@@ -24,7 +21,7 @@ import {
 /**
  * Handle "pull_request" event
  */
-export default async function handlePullRequest(): Promise<void> {
+export default async function handlePullRequestComment(): Promise<void> {
     if (!process.env.GITHUB_TOKEN) {
         core.setFailed("GITHUB_TOKEN environment variable is not set");
         return;
@@ -34,26 +31,21 @@ export default async function handlePullRequest(): Promise<void> {
 
     const eventPayload = JSON.parse(
         readFileSync(process.env.GITHUB_EVENT_PATH, {encoding: "utf8"})
-    ) as PullRequestEvent;
+    ) as IssueCommentEvent;
 
-    const pullRequest = eventPayload.pull_request;
+    const issue = eventPayload.issue;
 
     core.info(
-        `Handling pull request ${eventPayload.action} for ${pullRequest.html_url}`
+        `Handling issue ${eventPayload.action} for ${issue.html_url}`
     );
 
-    if (pullRequest.state !== "open") {
-        core.info("Pull request already closed, ignoring");
+    if (issue.state !== "open") {
+        core.info("Issue already closed, ignoring");
         return;
     }
 
-    if (isFork(pullRequest as SimplePullRequest)) {
-        core.setFailed("Setting a scheduled merge is not allowed from forks");
-        return;
-    }
-
-    const previousComment = await getPreviousComment(octokit, pullRequest.number);
-    const scheduledDate = await findScheduleDateCommand(pullRequest.number, octokit);
+    const previousComment = await getPreviousComment(octokit, issue.number);
+    const scheduledDate: string = await findScheduleDateCommand(issue.number, octokit);
 
     if (scheduledDate) {
         core.info(`Schedule date found: "${scheduledDate}"`);
@@ -108,7 +100,7 @@ export default async function handlePullRequest(): Promise<void> {
 
     const {data} = await createComment(
         octokit,
-        pullRequest.number,
+        issue.number,
         commentBody
     );
     core.info(`Comment created: ${data.html_url}`);

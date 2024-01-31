@@ -9566,6 +9566,108 @@ exports.getCommitStatusesStatus = getCommitStatusesStatus;
 
 /***/ }),
 
+/***/ 3285:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
+const fs_1 = __nccwpck_require__(7147);
+const locale_date_1 = __importDefault(__nccwpck_require__(3663));
+const utils_1 = __nccwpck_require__(1715);
+const comment_1 = __nccwpck_require__(8111);
+/**
+ * Handle "pull_request" event
+ */
+async function handlePullRequestComment() {
+    if (!process.env.GITHUB_TOKEN) {
+        core.setFailed("GITHUB_TOKEN environment variable is not set");
+        return;
+    }
+    const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+    const eventPayload = JSON.parse((0, fs_1.readFileSync)(process.env.GITHUB_EVENT_PATH, { encoding: "utf8" }));
+    const issue = eventPayload.issue;
+    core.info(`Handling issue ${eventPayload.action} for ${issue.html_url}`);
+    if (issue.state !== "open") {
+        core.info("Issue already closed, ignoring");
+        return;
+    }
+    const previousComment = await (0, comment_1.getPreviousComment)(octokit, issue.number);
+    const scheduledDate = await (0, utils_1.findScheduleDateCommand)(issue.number, octokit);
+    if (scheduledDate) {
+        core.info(`Schedule date found: "${scheduledDate}"`);
+    }
+    else {
+        if (previousComment) {
+            await (0, comment_1.deleteComment)(octokit, previousComment.id);
+        }
+        core.info("No /schedule command found");
+        return;
+    }
+    let commentBody;
+    if (scheduledDate) {
+        if (!(0, utils_1.isValidDate)(scheduledDate)) {
+            commentBody = (0, comment_1.generateBody)(`"${scheduledDate}" is not a valid date`, "error");
+        }
+        else if (new Date(scheduledDate) < (0, locale_date_1.default)()) {
+            let message = `${(0, utils_1.stringifyDate)(scheduledDate)} (UTC) is already in the past`;
+            if (process.env.INPUT_TIME_ZONE !== "UTC") {
+                message = `${message} on ${process.env.INPUT_TIME_ZONE} time zone`;
+            }
+            commentBody = (0, comment_1.generateBody)(message, "warning");
+        }
+        else {
+            commentBody = (0, comment_1.generateBody)(`Scheduled to be merged on ${(0, utils_1.stringifyDate)(scheduledDate)} (UTC)`, "pending");
+        }
+    }
+    else {
+        commentBody = (0, comment_1.generateBody)(`Scheduled to be merged the next time the merge action is scheduled via the cron expressions`, "pending");
+    }
+    if (previousComment) {
+        if (previousComment.body === commentBody) {
+            core.info("Comment already up to date");
+            return;
+        }
+        const { data } = await (0, comment_1.updateComment)(octokit, previousComment.id, commentBody);
+        core.info(`Comment updated: ${data.html_url}`);
+        return;
+    }
+    const { data } = await (0, comment_1.createComment)(octokit, issue.number, commentBody);
+    core.info(`Comment created: ${data.html_url}`);
+}
+exports["default"] = handlePullRequestComment;
+
+
+/***/ }),
+
 /***/ 2719:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -9625,31 +9727,31 @@ async function handlePullRequest() {
         return;
     }
     const previousComment = await (0, comment_1.getPreviousComment)(octokit, pullRequest.number);
-    if (!(0, utils_1.hasScheduleCommand)(pullRequest.body)) {
+    const scheduledDate = await (0, utils_1.findScheduleDateCommand)(pullRequest.number, octokit);
+    if (scheduledDate) {
+        core.info(`Schedule date found: "${scheduledDate}"`);
+    }
+    else {
         if (previousComment) {
             await (0, comment_1.deleteComment)(octokit, previousComment.id);
         }
         core.info("No /schedule command found");
         return;
     }
-    const datestring = (0, utils_1.getScheduleDateString)(pullRequest.body);
-    if (datestring) {
-        core.info(`Schedule date found: "${datestring}"`);
-    }
-    let commentBody = "";
-    if (datestring) {
-        if (!(0, utils_1.isValidDate)(datestring)) {
-            commentBody = (0, comment_1.generateBody)(`"${datestring}" is not a valid date`, "error");
+    let commentBody;
+    if (scheduledDate) {
+        if (!(0, utils_1.isValidDate)(scheduledDate)) {
+            commentBody = (0, comment_1.generateBody)(`"${scheduledDate}" is not a valid date`, "error");
         }
-        else if (new Date(datestring) < (0, locale_date_1.default)()) {
-            let message = `${(0, utils_1.stringifyDate)(datestring)} (UTC) is already in the past`;
+        else if (new Date(scheduledDate) < (0, locale_date_1.default)()) {
+            let message = `${(0, utils_1.stringifyDate)(scheduledDate)} (UTC) is already in the past`;
             if (process.env.INPUT_TIME_ZONE !== "UTC") {
                 message = `${message} on ${process.env.INPUT_TIME_ZONE} time zone`;
             }
             commentBody = (0, comment_1.generateBody)(message, "warning");
         }
         else {
-            commentBody = (0, comment_1.generateBody)(`Scheduled to be merged on ${(0, utils_1.stringifyDate)(datestring)} (UTC)`, "pending");
+            commentBody = (0, comment_1.generateBody)(`Scheduled to be merged on ${(0, utils_1.stringifyDate)(scheduledDate)} (UTC)`, "pending");
         }
     }
     else {
@@ -9725,15 +9827,18 @@ async function handleSchedule() {
         core.setFailed(`merge_method "${mergeMethod}" is invalid`);
         return;
     }
+    core.info(`GITHUB_TOKEN: ${process.env.GITHUB_TOKEN}`);
     const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
     core.info("Loading open pull requests");
     const pullRequests = await octokit.paginate(octokit.rest.pulls.list, {
         ...github.context.repo,
         state: "open",
     }, (response) => {
-        return response.data
+        const responseData = response.data;
+        console.info(responseData);
+        return responseData
             .filter((pullRequest) => !(0, utils_1.isFork)(pullRequest))
-            .filter((pullRequest) => (0, utils_1.hasScheduleCommand)(pullRequest.body))
+            .filter((pullRequest) => (0, utils_1.findScheduleDateCommand)(pullRequest.number, octokit))
             .filter((pullRequest) => pullRequest.labels.every((label) => label.name !== automergeFailLabel))
             .map((pullRequest) => {
             return {
@@ -9850,11 +9955,16 @@ const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const handle_pull_request_1 = __importDefault(__nccwpck_require__(2719));
 const handle_schedule_1 = __importDefault(__nccwpck_require__(7976));
+const handle_pull_request_comment_1 = __importDefault(__nccwpck_require__(3285));
 main();
 async function main() {
     try {
         if (github.context.eventName === "pull_request") {
             await (0, handle_pull_request_1.default)();
+            return;
+        }
+        if (github.context.eventName === "issue_comment") {
+            await (0, handle_pull_request_comment_1.default)();
             return;
         }
         await (0, handle_schedule_1.default)();
@@ -9885,18 +9995,60 @@ exports["default"] = localeDate;
 /***/ }),
 
 /***/ 1715:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.stringifyDate = exports.isValidDate = exports.isValidMergeMethod = exports.getScheduleDateString = exports.isFork = exports.hasScheduleCommand = void 0;
-function hasScheduleCommand(text) {
-    if (!text)
-        return false;
-    return /(^|\n)\/schedule/.test(text);
+exports.stringifyDate = exports.isValidDate = exports.isValidMergeMethod = exports.getScheduleDateString = exports.isFork = exports.findScheduleDateCommand = void 0;
+const github = __importStar(__nccwpck_require__(5438));
+const core = __importStar(__nccwpck_require__(2186));
+async function findScheduleDateCommand(pullRequestId, octokit) {
+    const pullRequestResponse = await octokit.rest.pulls.get({
+        ...github.context.repo,
+        pull_number: pullRequestId,
+    });
+    const bodyDate = getScheduleDateString(pullRequestResponse.data.body);
+    const commentDates = await octokit.paginate(octokit.rest.issues.listComments, {
+        ...github.context.repo,
+        issue_number: pullRequestResponse.data.number,
+    }, (response) => {
+        return response
+            .data
+            .flatMap((comment) => getScheduleDateString(comment.body ?? ""))
+            .filter(Boolean)
+            .map((dateString) => new Date(dateString).toISOString());
+    });
+    commentDates.unshift(bodyDate);
+    core.info(`Dates: ${commentDates}`);
+    const lastDate = commentDates.pop() ?? "";
+    core.info(`Last date: ${lastDate}`);
+    return lastDate;
 }
-exports.hasScheduleCommand = hasScheduleCommand;
+exports.findScheduleDateCommand = findScheduleDateCommand;
 function isFork(pullRequest) {
     return pullRequest.head.repo.fork;
 }
@@ -9914,9 +10066,8 @@ exports.isValidMergeMethod = isValidMergeMethod;
 /**
  * @reference https://stackoverflow.com/a/1353711/206879
  */
-function isValidDate(datestring) {
-    const date = new Date(datestring);
-    return date instanceof Date && !isNaN(date);
+function isValidDate(dateString) {
+    return !isNaN(new Date(dateString).getTime());
 }
 exports.isValidDate = isValidDate;
 function stringifyDate(datestring) {

@@ -1,5 +1,10 @@
 name: Merge Schedule
-"on":
+on:
+  issue_comment:
+    types:
+      - created
+      - edited
+      - deleted
   pull_request:
     types:
       - opened
@@ -7,7 +12,7 @@ name: Merge Schedule
       - synchronize
   schedule:
     - cron: 0 * * * *
-  workflow_dispatch: {}
+  workflow_dispatch: { }
 jobs:
   merge_schedule:
     runs-on: ubuntu-latest
@@ -19,10 +24,8 @@ jobs:
           cache: npm
           node-version: lts/*
       - run: npm ci
-      - if: ${{ github.event_name == 'pull_request' }}
-        run: npm run lint
-      - if: ${{ github.event_name == 'pull_request' }}
-        run: npm run test:ci
+      - run: npm run lint
+      - run: npm run test:ci
       - run: npm run build
       - uses: ./
         env:

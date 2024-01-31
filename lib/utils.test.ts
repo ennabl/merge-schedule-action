@@ -2,7 +2,6 @@ import timezoneMock from "timezone-mock";
 import { test, expect } from "vitest";
 import {
   getScheduleDateString,
-  hasScheduleCommand,
   isValidMergeMethod,
   isValidDate,
   stringifyDate,
@@ -17,20 +16,6 @@ test("getScheduleDateString", () => {
   expect(getScheduleDateString("/schedule 2022-06-08T12:00:00")).toBe(
     "2022-06-08T12:00:00"
   );
-});
-
-test("hasScheduleCommand", () => {
-  expect(hasScheduleCommand(null)).toBe(false);
-  expect(hasScheduleCommand("")).toBe(false);
-  expect(hasScheduleCommand("/schedule")).toBe(true);
-  expect(hasScheduleCommand("/schedule ")).toBe(true);
-  expect(hasScheduleCommand("\n/schedule")).toBe(true);
-  expect(hasScheduleCommand("\n/schedule ")).toBe(true);
-  expect(hasScheduleCommand("Something\n/schedule")).toBe(true);
-  expect(hasScheduleCommand("Something /schedule ")).toBe(false);
-  expect(hasScheduleCommand("Something\n/schedule ")).toBe(true);
-  expect(hasScheduleCommand("Something /schedule \nelse")).toBe(false);
-  expect(hasScheduleCommand("Something\n/schedule \nelse")).toBe(true);
 });
 
 test("isValidMergeMethod", () => {
