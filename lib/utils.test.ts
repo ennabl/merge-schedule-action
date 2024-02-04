@@ -6,6 +6,7 @@ import {
   isValidDate,
   stringifyDate,
 } from "./utils";
+import { localeDateString } from "./locale-date";
 
 timezoneMock.register("UTC");
 
@@ -26,20 +27,22 @@ test("isValidMergeMethod", () => {
 });
 
 test("isValidDate", () => {
-  expect(isValidDate(new Date("2022-06-08"))).toBe(true);
-  expect(isValidDate(new Date("2022-06-08T09:00:00"))).toBe(true);
-  expect(isValidDate(new Date("2022-06-08T15:00:00Z"))).toBe(true);
-  expect(isValidDate(new Date("2022-16-08"))).toBe(false);
-  expect(isValidDate(new Date("2022-16-08T09:00:00"))).toBe(false);
-  expect(isValidDate(new Date("2022-16-08T15:00:00Z"))).toBe(false);
+  expect(isValidDate(localeDateString("2022-06-08"))).toBe(true);
+  expect(isValidDate(localeDateString("2022-06-08T09:00:00"))).toBe(true);
+  expect(isValidDate(localeDateString("2022-06-08T15:00:00Z"))).toBe(true);
+  expect(isValidDate(localeDateString("2022-16-08"))).toBe(false);
+  expect(isValidDate(localeDateString("2022-16-08T09:00:00"))).toBe(false);
+  expect(isValidDate(localeDateString("2022-16-08T15:00:00Z"))).toBe(false);
 });
 
 test("stringifyDate", () => {
-  expect(stringifyDate(new Date("2022-06-08"))).toBe("2022-06-08 00:00:00");
-  expect(stringifyDate(new Date("2022-06-08T09:00:00"))).toBe(
-    "2022-06-08 09:00:00"
+  expect(stringifyDate(localeDateString("2022-06-08"))).toBe(
+    "June 8th 2022, 00:00:00"
   );
-  expect(stringifyDate(new Date("2022-06-08T15:00:00Z"))).toBe(
-    "2022-06-08 15:00:00"
+  expect(stringifyDate(localeDateString("2022-06-08T09:00:00"))).toBe(
+    "June 8th 2022, 09:00:00"
+  );
+  expect(stringifyDate(localeDateString("2022-06-08T15:00:00Z"))).toBe(
+    "June 8th 2022, 15:00:00"
   );
 });

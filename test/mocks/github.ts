@@ -231,7 +231,7 @@ const pullRequestComments = pullRequests.map((pullRequest) => {
     const bodyMappings: Record<number, string[]> = {
         3: ["<!-- Merge Schedule Pull Request Comment -->"],
         4: [
-            `:hourglass: **Merge Schedule**\nScheduled to be merged on 2022-06-12 00:00:00 (UTC)\n<!-- Merge Schedule Pull Request Comment -->`
+            `:hourglass: **Merge Schedule**\nScheduled to be merged on June 12th 2022, 00:00:00 (UTC)\n<!-- Merge Schedule Pull Request Comment -->`
         ],
         6: [
             `:x: **Merge Schedule**\nScheduled merge failed: Pull Request is not mergeable\nIn order to let the automerge-automation try again, the label "automerge-fail" should be removed.\n<!-- Merge Schedule Pull Request Comment Fail -->`

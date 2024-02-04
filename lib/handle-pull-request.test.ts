@@ -1,6 +1,14 @@
 import mockDate from "mockdate";
 import timezoneMock from "timezone-mock";
-import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+  vi,
+} from "vitest";
 import { mockProcessStdout } from "vitest-mock-process";
 import {
   cleanupWebhooksFolder,
@@ -16,6 +24,10 @@ mockDate.set("2022-06-10T00:00:00.000Z");
 describe("handlePullRequest", () => {
   beforeAll(() => {
     setupWebhooksFolder("pull-request");
+  });
+
+  beforeEach(() => {
+    process.env.INPUT_TIME_ZONE = "UTC";
   });
 
   afterAll(() => {
@@ -125,18 +137,18 @@ describe("handlePullRequest", () => {
     expect(createComment.mock.calls).toHaveLength(1);
     expect(createComment.mock.calls[0][2]).toMatchInlineSnapshot(`
       ":warning: **Merge Schedule**
-      2022-06-08 00:00:00 is already in the past. Current time is 2022-06-09 18:00:00. Timezone: UTC
+      June 8th 2022, 00:00:00 is already in the past. Current time is June 10th 2022, 00:00:00. Timezone: UTC
       <!-- Merge Schedule Pull Request Comment -->"
     `);
   });
 
-  test("date in the past - custom time zone", async () => {
+  test("date in the past - custom timezone", async () => {
     const mockStdout = mockProcessStdout();
     const createComment = vi.spyOn(comment, "createComment");
     process.env.GITHUB_EVENT_PATH = generatePullRequestWebhook({
       body: "Pull request body\n/schedule 2022-06-08",
     });
-    process.env.INPUT_TIME_ZONE = "Europe/Lisbon";
+    process.env.INPUT_TIME_ZONE = "Europe/Moscow";
 
     await handlePullRequest();
 
@@ -152,7 +164,7 @@ describe("handlePullRequest", () => {
     expect(createComment.mock.calls).toHaveLength(1);
     expect(createComment.mock.calls[0][2]).toMatchInlineSnapshot(`
       ":warning: **Merge Schedule**
-      2022-06-08 00:00:00 is already in the past. Current time is 2022-06-09 19:00:00. Timezone: Europe/Lisbon
+      June 8th 2022, 00:00:00 is already in the past. Current time is June 10th 2022, 03:00:00. Timezone: Europe/Moscow
       <!-- Merge Schedule Pull Request Comment -->"
     `);
   });
@@ -176,7 +188,7 @@ describe("handlePullRequest", () => {
     expect(createComment.mock.calls).toHaveLength(1);
     expect(createComment.mock.calls[0][2]).toMatchInlineSnapshot(`
       ":hourglass: **Merge Schedule**
-      Scheduled to be merged on 2022-06-12 00:00:00 (UTC)
+      Scheduled to be merged on June 12th 2022, 00:00:00 (UTC)
       <!-- Merge Schedule Pull Request Comment -->"
     `);
   });
@@ -200,7 +212,7 @@ describe("handlePullRequest", () => {
     expect(updateComment.mock.calls).toHaveLength(1);
     expect(updateComment.mock.calls[0][2]).toMatchInlineSnapshot(`
       ":hourglass: **Merge Schedule**
-      Scheduled to be merged on 2022-06-12 00:00:00 (UTC)
+      Scheduled to be merged on June 12th 2022, 00:00:00 (UTC)
       <!-- Merge Schedule Pull Request Comment -->"
     `);
   });

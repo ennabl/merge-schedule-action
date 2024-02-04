@@ -1,6 +1,9 @@
-export default function localeDate(): Date {
-  const localeString = new Date().toLocaleString("en-US", {
-    timeZone: process.env.INPUT_TIME_ZONE,
-  });
-  return new Date(localeString);
+import moment from "moment-timezone";
+
+export function localeDate(): moment.Moment {
+  return moment().tz(process.env.INPUT_TIME_ZONE);
+}
+
+export function localeDateString(date: string): moment.Moment {
+  return moment.tz(date, process.env.INPUT_TIME_ZONE);
 }

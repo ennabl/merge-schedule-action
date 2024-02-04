@@ -41,7 +41,7 @@ describe("handlePullRequestComment", () => {
     expect(createComment.mock.calls).toHaveLength(1);
     expect(createComment.mock.calls[0][2]).toMatchInlineSnapshot(`
       ":hourglass: **Merge Schedule**
-      Scheduled to be merged on 2022-06-12 00:00:00 (UTC)
+      Scheduled to be merged on June 12th 2022, 00:00:00 (UTC)
       <!-- Merge Schedule Pull Request Comment -->"
     `);
   });
@@ -65,7 +65,7 @@ describe("handlePullRequestComment", () => {
     expect(createComment.mock.calls).toHaveLength(1);
     expect(createComment.mock.calls[0][2]).toMatchInlineSnapshot(`
       ":hourglass: **Merge Schedule**
-      Scheduled to be merged on 2022-06-14 00:00:00 (UTC)
+      Scheduled to be merged on June 14th 2022, 00:00:00 (UTC)
       <!-- Merge Schedule Pull Request Comment -->"
     `);
   });

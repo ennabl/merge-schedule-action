@@ -1,4 +1,5 @@
 import type { SimplePullRequest } from "@octokit/webhooks-types";
+import moment from "moment-timezone";
 
 export function hasScheduleCommand(text: string): boolean {
   return Boolean(text && /(^|\n)\/schedule/.test(text));
@@ -9,18 +10,12 @@ export function getScheduleDateString(text: string): string {
   return text.match(/(^|\n)\/schedule (.*)/)?.pop() ?? "";
 }
 
-export function getScheduleDate(text: string): Date {
-  return new Date(getScheduleDateString(text));
+export function isValidDate(date: moment.Moment): boolean {
+  return date.isValid();
 }
 
-export function isValidDate(date: Date): boolean {
-  return !isNaN(date.getTime());
-}
-
-export function stringifyDate(date: Date): string {
-  const dateTimeString = date.toISOString().split(".")[0];
-  const [day, time] = dateTimeString.split("T");
-  return `${day} ${time}`;
+export function stringifyDate(date: moment.Moment): string {
+  return date.format("MMMM Do YYYY, HH:mm:ss");
 }
 
 export function isFork(pullRequest: SimplePullRequest): boolean {

@@ -13,7 +13,7 @@ import {
   isValidDate,
   stringifyDate,
 } from "./utils";
-import localeDate from "./locale-date";
+import { localeDate, localeDateString } from "./locale-date";
 
 export default async function schedule(pullRequestId: number): Promise<void> {
   if (!process.env.GITHUB_TOKEN) {
@@ -66,7 +66,7 @@ export default async function schedule(pullRequestId: number): Promise<void> {
       .reverse()
       .map((element) => getScheduleDateString(element))
       .find((element) => element !== "") ?? "";
-  const scheduledDate = new Date(scheduledDateString);
+  const scheduledDate = localeDateString(scheduledDateString);
 
   core.info(
     `Schedule command found in pull request body: "${scheduledDateString}"`
@@ -88,7 +88,9 @@ export default async function schedule(pullRequestId: number): Promise<void> {
     commentBody = generateBody(message, "warning");
   } else {
     commentBody = generateBody(
-      `Scheduled to be merged on ${stringifyDate(scheduledDate)} (UTC)`,
+      `Scheduled to be merged on ${stringifyDate(scheduledDate)} (${
+        process.env.INPUT_TIME_ZONE
+      })`,
       "pending"
     );
   }

@@ -7,7 +7,7 @@ import {
   getPreviousComment,
   updateComment,
 } from "./comment";
-import localeDate from "./locale-date";
+import { localeDate, localeDateString } from "./locale-date";
 import { getCommitChecksRunsStatus, getCommitStatusesStatus } from "./commit";
 import {
   isFork,
@@ -16,11 +16,12 @@ import {
   stringifyDate,
   getScheduleDateString,
 } from "./utils";
+import moment from "moment-timezone";
 
 interface ScheduledPullRequest {
   number: number;
   html_url: string;
-  scheduledDate: Date;
+  scheduledDate: moment.Moment;
   ref: string;
 }
 
@@ -89,7 +90,7 @@ export default async function handleSchedule(): Promise<void> {
             return {
               number: pullRequest.number,
               html_url: pullRequest.html_url,
-              scheduledDate: new Date(scheduledDateString),
+              scheduledDate: localeDateString(scheduledDateString),
               ref: pullRequest.head.sha,
             };
           } else {
@@ -182,9 +183,9 @@ export default async function handleSchedule(): Promise<void> {
     let commentBody = "";
     if (pullRequest.scheduledDate) {
       commentBody = generateBody(
-        `Scheduled on ${stringifyDate(
-          pullRequest.scheduledDate
-        )} (UTC) successfully merged`,
+        `Scheduled on ${stringifyDate(pullRequest.scheduledDate)} (${
+          process.env.INPUT_TIME_ZONE
+        }) successfully merged`,
         "success"
       );
     } else {
