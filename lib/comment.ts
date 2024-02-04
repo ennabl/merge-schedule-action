@@ -28,8 +28,7 @@ export async function getPreviousComment(
       );
     }
   );
-  const previousComment = prComments.pop();
-  return previousComment;
+  return prComments.pop();
 }
 
 type State = "error" | "warning" | "pending" | "success";

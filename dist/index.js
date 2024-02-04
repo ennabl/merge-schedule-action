@@ -9458,8 +9458,7 @@ async function getPreviousComment(octokit, pullRequestNumber, variant = "default
     }, (response) => {
         return response.data.filter((comment) => comment.body?.includes(variant === "fail" ? commentFailFooter : commentFooter));
     });
-    const previousComment = prComments.pop();
-    return previousComment;
+    return prComments.pop();
 }
 exports.getPreviousComment = getPreviousComment;
 const statePrefix = {
@@ -9599,11 +9598,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
-const github = __importStar(__nccwpck_require__(5438));
 const fs_1 = __nccwpck_require__(7147);
-const locale_date_1 = __importDefault(__nccwpck_require__(3663));
-const utils_1 = __nccwpck_require__(1715);
-const comment_1 = __nccwpck_require__(8111);
+const schedule_1 = __importDefault(__nccwpck_require__(6394));
 /**
  * Handle "pull_request" event
  */
@@ -9612,56 +9608,18 @@ async function handlePullRequestComment() {
         core.setFailed("GITHUB_TOKEN environment variable is not set");
         return;
     }
-    const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
     const eventPayload = JSON.parse((0, fs_1.readFileSync)(process.env.GITHUB_EVENT_PATH, { encoding: "utf8" }));
     const issue = eventPayload.issue;
-    core.info(`Handling issue ${eventPayload.action} for ${issue.html_url}`);
+    core.info(`Handling issue_comment ${eventPayload.action} for ${issue.html_url}`);
     if (issue.state !== "open") {
         core.info("Issue already closed, ignoring");
         return;
     }
-    const previousComment = await (0, comment_1.getPreviousComment)(octokit, issue.number);
-    const scheduledDate = await (0, utils_1.findScheduleDateCommand)(issue.number, octokit);
-    if (scheduledDate) {
-        core.info(`Schedule date found: "${scheduledDate}"`);
-    }
-    else {
-        if (previousComment) {
-            await (0, comment_1.deleteComment)(octokit, previousComment.id);
-        }
-        core.info("No /schedule command found");
+    if (eventPayload.action === "deleted") {
+        core.info("Comment deleted, ignoring");
         return;
     }
-    let commentBody;
-    if (scheduledDate) {
-        if (!(0, utils_1.isValidDate)(scheduledDate)) {
-            commentBody = (0, comment_1.generateBody)(`"${scheduledDate}" is not a valid date`, "error");
-        }
-        else if (new Date(scheduledDate) < (0, locale_date_1.default)()) {
-            let message = `${(0, utils_1.stringifyDate)(scheduledDate)} (UTC) is already in the past`;
-            if (process.env.INPUT_TIME_ZONE !== "UTC") {
-                message = `${message} on ${process.env.INPUT_TIME_ZONE} time zone`;
-            }
-            commentBody = (0, comment_1.generateBody)(message, "warning");
-        }
-        else {
-            commentBody = (0, comment_1.generateBody)(`Scheduled to be merged on ${(0, utils_1.stringifyDate)(scheduledDate)} (UTC)`, "pending");
-        }
-    }
-    else {
-        commentBody = (0, comment_1.generateBody)(`Scheduled to be merged the next time the merge action is scheduled via the cron expressions`, "pending");
-    }
-    if (previousComment) {
-        if (previousComment.body === commentBody) {
-            core.info("Comment already up to date");
-            return;
-        }
-        const { data } = await (0, comment_1.updateComment)(octokit, previousComment.id, commentBody);
-        core.info(`Comment updated: ${data.html_url}`);
-        return;
-    }
-    const { data } = await (0, comment_1.createComment)(octokit, issue.number, commentBody);
-    core.info(`Comment created: ${data.html_url}`);
+    await (0, schedule_1.default)(eventPayload.issue.number);
 }
 exports["default"] = handlePullRequestComment;
 
@@ -9701,11 +9659,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
-const github = __importStar(__nccwpck_require__(5438));
 const fs_1 = __nccwpck_require__(7147);
-const locale_date_1 = __importDefault(__nccwpck_require__(3663));
 const utils_1 = __nccwpck_require__(1715);
-const comment_1 = __nccwpck_require__(8111);
+const schedule_1 = __importDefault(__nccwpck_require__(6394));
 /**
  * Handle "pull_request" event
  */
@@ -9714,7 +9670,6 @@ async function handlePullRequest() {
         core.setFailed("GITHUB_TOKEN environment variable is not set");
         return;
     }
-    const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
     const eventPayload = JSON.parse((0, fs_1.readFileSync)(process.env.GITHUB_EVENT_PATH, { encoding: "utf8" }));
     const pullRequest = eventPayload.pull_request;
     core.info(`Handling pull request ${eventPayload.action} for ${pullRequest.html_url}`);
@@ -9726,48 +9681,7 @@ async function handlePullRequest() {
         core.setFailed("Setting a scheduled merge is not allowed from forks");
         return;
     }
-    const previousComment = await (0, comment_1.getPreviousComment)(octokit, pullRequest.number);
-    const scheduledDate = await (0, utils_1.findScheduleDateCommand)(pullRequest.number, octokit);
-    if (scheduledDate) {
-        core.info(`Schedule date found: "${scheduledDate}"`);
-    }
-    else {
-        if (previousComment) {
-            await (0, comment_1.deleteComment)(octokit, previousComment.id);
-        }
-        core.info("No /schedule command found");
-        return;
-    }
-    let commentBody;
-    if (scheduledDate) {
-        if (!(0, utils_1.isValidDate)(scheduledDate)) {
-            commentBody = (0, comment_1.generateBody)(`"${scheduledDate}" is not a valid date`, "error");
-        }
-        else if (new Date(scheduledDate) < (0, locale_date_1.default)()) {
-            let message = `${(0, utils_1.stringifyDate)(scheduledDate)} (UTC) is already in the past`;
-            if (process.env.INPUT_TIME_ZONE !== "UTC") {
-                message = `${message} on ${process.env.INPUT_TIME_ZONE} time zone`;
-            }
-            commentBody = (0, comment_1.generateBody)(message, "warning");
-        }
-        else {
-            commentBody = (0, comment_1.generateBody)(`Scheduled to be merged on ${(0, utils_1.stringifyDate)(scheduledDate)} (UTC)`, "pending");
-        }
-    }
-    else {
-        commentBody = (0, comment_1.generateBody)(`Scheduled to be merged the next time the merge action is scheduled via the cron expressions`, "pending");
-    }
-    if (previousComment) {
-        if (previousComment.body === commentBody) {
-            core.info("Comment already up to date");
-            return;
-        }
-        const { data } = await (0, comment_1.updateComment)(octokit, previousComment.id, commentBody);
-        core.info(`Comment updated: ${data.html_url}`);
-        return;
-    }
-    const { data } = await (0, comment_1.createComment)(octokit, pullRequest.number, commentBody);
-    core.info(`Comment created: ${data.html_url}`);
+    await (0, schedule_1.default)(pullRequest.number);
 }
 exports["default"] = handlePullRequest;
 
@@ -9830,30 +9744,46 @@ async function handleSchedule() {
     core.info(`GITHUB_TOKEN: ${process.env.GITHUB_TOKEN}`);
     const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
     core.info("Loading open pull requests");
-    const pullRequests = await octokit.paginate(octokit.rest.pulls.list, {
+    const pullRequestsFilteredByLabel = await octokit.paginate(octokit.rest.pulls.list, {
         ...github.context.repo,
         state: "open",
     }, (response) => {
-        const responseData = response.data;
-        return responseData
+        return response.data
             .filter((pullRequest) => !(0, utils_1.isFork)(pullRequest))
-            .filter((pullRequest) => (0, utils_1.findScheduleDateCommand)(pullRequest.number, octokit))
-            .filter((pullRequest) => pullRequest.labels.every((label) => label.name !== automergeFailLabel))
-            .map((pullRequest) => {
+            .filter((pullRequest) => pullRequest.labels.every((label) => label.name !== automergeFailLabel));
+    });
+    const pullRequests = (await Promise.all(pullRequestsFilteredByLabel.map(async (pullRequest) => {
+        const comments = await octokit.rest.issues.listComments({
+            ...github.context.repo,
+            issue_number: pullRequest.number,
+        });
+        const prHasScheduleCommand = (0, utils_1.hasScheduleCommand)(pullRequest.body ?? "") ||
+            comments.data.some((comment) => (0, utils_1.hasScheduleCommand)(comment.body ?? ""));
+        if (prHasScheduleCommand) {
+            const commentsWithBody = [
+                pullRequest.body ?? "",
+                ...comments.data.map((c) => c.body ?? ""),
+            ];
+            const scheduledDateString = commentsWithBody
+                .reverse()
+                .map((element) => (0, utils_1.getScheduleDateString)(element))
+                .find((element) => element !== "") ?? "";
             return {
                 number: pullRequest.number,
                 html_url: pullRequest.html_url,
-                scheduledDate: (0, utils_1.getScheduleDateString)(pullRequest.body),
+                scheduledDate: new Date(scheduledDateString),
                 ref: pullRequest.head.sha,
             };
-        });
-    });
+        }
+        else {
+            return null;
+        }
+    }))).filter(Boolean);
     core.info(`${pullRequests.length} scheduled pull requests found`);
     if (pullRequests.length === 0) {
         return;
     }
-    const duePullRequests = pullRequests.filter((pullRequest) => pullRequest.scheduledDate === "" ||
-        new Date(pullRequest.scheduledDate) < (0, locale_date_1.default)());
+    const duePullRequests = pullRequests.filter((pr) => pr.scheduledDate < (0, locale_date_1.default)());
     core.info(`${duePullRequests.length} due pull requests found`);
     if (duePullRequests.length === 0) {
         return;
@@ -9899,7 +9829,7 @@ async function handleSchedule() {
         const previousComment = await (0, comment_1.getPreviousComment)(octokit, pullRequest.number);
         let commentBody = "";
         if (pullRequest.scheduledDate) {
-            commentBody = (0, comment_1.generateBody)(`Scheduled on ${pullRequest.scheduledDate} (UTC) successfully merged`, "success");
+            commentBody = (0, comment_1.generateBody)(`Scheduled on ${(0, utils_1.stringifyDate)(pullRequest.scheduledDate)} (UTC) successfully merged`, "success");
         }
         else {
             commentBody = (0, comment_1.generateBody)(`Scheduled on next cron expression successfully merged`, "success");
@@ -9993,7 +9923,7 @@ exports["default"] = localeDate;
 
 /***/ }),
 
-/***/ 1715:
+/***/ 6394:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -10021,60 +9951,117 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.stringifyDate = exports.isValidDate = exports.isValidMergeMethod = exports.getScheduleDateString = exports.isFork = exports.findScheduleDateCommand = void 0;
-const github = __importStar(__nccwpck_require__(5438));
 const core = __importStar(__nccwpck_require__(2186));
-async function findScheduleDateCommand(pullRequestId, octokit) {
-    const pullRequestResponse = await octokit.rest.pulls.get({
+const github = __importStar(__nccwpck_require__(5438));
+const comment_1 = __nccwpck_require__(8111);
+const utils_1 = __nccwpck_require__(1715);
+const locale_date_1 = __importDefault(__nccwpck_require__(3663));
+async function schedule(pullRequestId) {
+    if (!process.env.GITHUB_TOKEN) {
+        core.setFailed("GITHUB_TOKEN environment variable is not set");
+        return;
+    }
+    const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+    const pullRequest = await octokit.rest.pulls.get({
         ...github.context.repo,
         pull_number: pullRequestId,
     });
-    const bodyDate = getScheduleDateString(pullRequestResponse.data.body);
-    const commentDates = await octokit.paginate(octokit.rest.issues.listComments, {
+    const previousComment = await (0, comment_1.getPreviousComment)(octokit, pullRequest.data.number);
+    const comments = await octokit.paginate(octokit.rest.issues.listComments, {
         ...github.context.repo,
-        issue_number: pullRequestResponse.data.number,
+        issue_number: pullRequestId,
     }, (response) => {
-        return response
-            .data
-            .flatMap((comment) => getScheduleDateString(comment.body ?? ""))
-            .filter(Boolean)
-            .map((dateString) => new Date(dateString).toISOString());
+        return response.data;
     });
-    commentDates.unshift(bodyDate);
-    core.info(`Dates: ${commentDates}`);
-    const lastDate = commentDates.pop() ?? "";
-    core.info(`Last date: ${lastDate}`);
-    return lastDate;
+    if (!((0, utils_1.hasScheduleCommand)(pullRequest.data.body ?? "") ||
+        comments.some((c) => (0, utils_1.hasScheduleCommand)(c.body ?? "")))) {
+        core.info("No /schedule command found");
+        if (previousComment) {
+            await (0, comment_1.deleteComment)(octokit, previousComment.id);
+        }
+        return;
+    }
+    const commentsWithBody = [
+        pullRequest.data.body ?? "",
+        ...comments.map((c) => c.body ?? ""),
+    ];
+    const scheduledDateString = commentsWithBody
+        .reverse()
+        .map((element) => (0, utils_1.getScheduleDateString)(element))
+        .find((element) => element !== "") ?? "";
+    const scheduledDate = new Date(scheduledDateString);
+    core.info(`Schedule command found in pull request body: "${scheduledDateString}"`);
+    let commentBody;
+    if (!(0, utils_1.isValidDate)(scheduledDate)) {
+        commentBody = (0, comment_1.generateBody)(`"${scheduledDateString}" is not a valid date`, "error");
+    }
+    else if (scheduledDate < (0, locale_date_1.default)()) {
+        const message = `${(0, utils_1.stringifyDate)(scheduledDate)} is already in the past. Current time is ${(0, utils_1.stringifyDate)((0, locale_date_1.default)())}. Timezone: ${process.env.INPUT_TIME_ZONE}`;
+        commentBody = (0, comment_1.generateBody)(message, "warning");
+    }
+    else {
+        commentBody = (0, comment_1.generateBody)(`Scheduled to be merged on ${(0, utils_1.stringifyDate)(scheduledDate)} (UTC)`, "pending");
+    }
+    if (previousComment) {
+        if (previousComment.body === commentBody) {
+            core.info("Comment already up to date");
+            return;
+        }
+        const { data } = await (0, comment_1.updateComment)(octokit, previousComment.id, commentBody);
+        core.info(`Comment updated: ${data.html_url}`);
+        return;
+    }
+    const { data } = await (0, comment_1.createComment)(octokit, pullRequest.data.number, commentBody);
+    core.info(`Comment created: ${data.html_url}`);
 }
-exports.findScheduleDateCommand = findScheduleDateCommand;
-function isFork(pullRequest) {
-    return pullRequest.head.repo.fork;
+exports["default"] = schedule;
+
+
+/***/ }),
+
+/***/ 1715:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.isValidMergeMethod = exports.isFork = exports.stringifyDate = exports.isValidDate = exports.getScheduleDate = exports.getScheduleDateString = exports.hasScheduleCommand = void 0;
+function hasScheduleCommand(text) {
+    return Boolean(text && /(^|\n)\/schedule/.test(text));
 }
-exports.isFork = isFork;
+exports.hasScheduleCommand = hasScheduleCommand;
 function getScheduleDateString(text) {
     if (!text)
         return "";
     return text.match(/(^|\n)\/schedule (.*)/)?.pop() ?? "";
 }
 exports.getScheduleDateString = getScheduleDateString;
+function getScheduleDate(text) {
+    return new Date(getScheduleDateString(text));
+}
+exports.getScheduleDate = getScheduleDate;
+function isValidDate(date) {
+    return !isNaN(date.getTime());
+}
+exports.isValidDate = isValidDate;
+function stringifyDate(date) {
+    const dateTimeString = date.toISOString().split(".")[0];
+    const [day, time] = dateTimeString.split("T");
+    return `${day} ${time}`;
+}
+exports.stringifyDate = stringifyDate;
+function isFork(pullRequest) {
+    return pullRequest.head.repo.fork;
+}
+exports.isFork = isFork;
 function isValidMergeMethod(method) {
     return ["merge", "squash", "rebase"].includes(method);
 }
 exports.isValidMergeMethod = isValidMergeMethod;
-/**
- * @reference https://stackoverflow.com/a/1353711/206879
- */
-function isValidDate(dateString) {
-    return !isNaN(new Date(dateString).getTime());
-}
-exports.isValidDate = isValidDate;
-function stringifyDate(datestring) {
-    const dateTimeString = new Date(datestring).toISOString().split(".")[0];
-    const [date, time] = dateTimeString.split("T");
-    return `${date} ${time}`;
-}
-exports.stringifyDate = stringifyDate;
 
 
 /***/ }),

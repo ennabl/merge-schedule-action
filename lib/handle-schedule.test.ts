@@ -32,8 +32,9 @@ describe("handleSchedule", () => {
     await handleSchedule();
 
     expect(mockStdout.mock.calls).toEqual([
+      [`GITHUB_TOKEN: some-token-here\n`],
       [`Loading open pull requests\n`],
-      [`7 scheduled pull requests found\n`],
+      [`13 scheduled pull requests found\n`],
       [`6 due pull requests found\n`],
       [`https://github.com/ennabl/merge-schedule-action/pull/2 merged\n`],
       [
@@ -51,19 +52,19 @@ describe("handleSchedule", () => {
         `Comment updated: https://github.com/ennabl/merge-schedule-action/issues/6#issuecomment-61\n`,
       ],
       [`Label added: "automerge-fail"\n`],
-      [`https://github.com/ennabl/merge-schedule-action/pull/7 merged\n`],
-      [
-        `Comment created: https://github.com/ennabl/merge-schedule-action/issues/7#issuecomment-72\n`,
-      ],
       [`https://github.com/ennabl/merge-schedule-action/pull/14 merged\n`],
       [
         `Comment created: https://github.com/ennabl/merge-schedule-action/issues/14#issuecomment-142\n`,
+      ],
+      [`https://github.com/ennabl/merge-schedule-action/pull/21 merged\n`],
+      [
+        `Comment created: https://github.com/ennabl/merge-schedule-action/issues/21#issuecomment-212\n`,
       ],
     ]);
     expect(createComment.mock.calls).toHaveLength(4);
     expect(createComment.mock.calls[0][2]).toMatchInlineSnapshot(`
       ":white_check_mark: **Merge Schedule**
-      Scheduled on 2022-06-08 (UTC) successfully merged
+      Scheduled on 2022-06-08 00:00:00 (UTC) successfully merged
       <!-- Merge Schedule Pull Request Comment -->"
     `);
     expect(createComment.mock.calls[1][2]).toMatchInlineSnapshot(`
@@ -74,13 +75,13 @@ describe("handleSchedule", () => {
     `);
     expect(createComment.mock.calls[2][2]).toMatchInlineSnapshot(`
       ":white_check_mark: **Merge Schedule**
-      Scheduled on next cron expression successfully merged
+      Scheduled on 2022-06-09 00:00:00 (UTC) successfully merged
       <!-- Merge Schedule Pull Request Comment -->"
     `);
     expect(updateComment.mock.calls).toHaveLength(2);
     expect(updateComment.mock.calls[0][2]).toMatchInlineSnapshot(`
       ":white_check_mark: **Merge Schedule**
-      Scheduled on 2022-06-09 (UTC) successfully merged
+      Scheduled on 2022-06-09 00:00:00 (UTC) successfully merged
       <!-- Merge Schedule Pull Request Comment -->"
     `);
     expect(updateComment.mock.calls[1][2]).toMatchInlineSnapshot(`
@@ -100,9 +101,10 @@ describe("handleSchedule", () => {
     await handleSchedule();
 
     expect(mockStdout.mock.calls).toEqual([
+      [`GITHUB_TOKEN: some-token-here\n`],
       [`Loading open pull requests\n`],
-      [`7 scheduled pull requests found\n`],
-      [`6 due pull requests found\n`],
+      [`12 scheduled pull requests found\n`],
+      [`5 due pull requests found\n`],
       [`https://github.com/ennabl/merge-schedule-action/pull/2 merged\n`],
       [
         `Comment created: https://github.com/ennabl/merge-schedule-action/issues/2#issuecomment-22\n`,
@@ -118,19 +120,15 @@ describe("handleSchedule", () => {
         `Comment updated: https://github.com/ennabl/merge-schedule-action/issues/6#issuecomment-61\n`,
       ],
       [`Label added: "automerge-fail"\n`],
-      [`https://github.com/ennabl/merge-schedule-action/pull/7 merged\n`],
-      [
-        `Comment created: https://github.com/ennabl/merge-schedule-action/issues/7#issuecomment-72\n`,
-      ],
       [`https://github.com/ennabl/merge-schedule-action/pull/14 merged\n`],
       [
         `Comment created: https://github.com/ennabl/merge-schedule-action/issues/14#issuecomment-142\n`,
       ],
     ]);
-    expect(createComment.mock.calls).toHaveLength(4);
+    expect(createComment.mock.calls).toHaveLength(3);
     expect(createComment.mock.calls[0][2]).toMatchInlineSnapshot(`
       ":white_check_mark: **Merge Schedule**
-      Scheduled on 2022-06-08 (UTC) successfully merged
+      Scheduled on 2022-06-08 00:00:00 (UTC) successfully merged
       <!-- Merge Schedule Pull Request Comment -->"
     `);
     expect(createComment.mock.calls[1][2]).toMatchInlineSnapshot(`
@@ -141,7 +139,7 @@ describe("handleSchedule", () => {
     `);
     expect(createComment.mock.calls[2][2]).toMatchInlineSnapshot(`
       ":white_check_mark: **Merge Schedule**
-      Scheduled on next cron expression successfully merged
+      Scheduled on 2022-06-09 00:00:00 (UTC) successfully merged
       <!-- Merge Schedule Pull Request Comment -->"
     `);
     expect(updateComment.mock.calls).toHaveLength(1);

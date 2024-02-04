@@ -26,16 +26,20 @@ test("isValidMergeMethod", () => {
 });
 
 test("isValidDate", () => {
-  expect(isValidDate("2022-06-08")).toBe(true);
-  expect(isValidDate("2022-06-08T09:00:00")).toBe(true);
-  expect(isValidDate("2022-06-08T15:00:00Z")).toBe(true);
-  expect(isValidDate("2022-16-08")).toBe(false);
-  expect(isValidDate("2022-16-08T09:00:00")).toBe(false);
-  expect(isValidDate("2022-16-08T15:00:00Z")).toBe(false);
+  expect(isValidDate(new Date("2022-06-08"))).toBe(true);
+  expect(isValidDate(new Date("2022-06-08T09:00:00"))).toBe(true);
+  expect(isValidDate(new Date("2022-06-08T15:00:00Z"))).toBe(true);
+  expect(isValidDate(new Date("2022-16-08"))).toBe(false);
+  expect(isValidDate(new Date("2022-16-08T09:00:00"))).toBe(false);
+  expect(isValidDate(new Date("2022-16-08T15:00:00Z"))).toBe(false);
 });
 
 test("stringifyDate", () => {
-  expect(stringifyDate("2022-06-08")).toBe("2022-06-08 00:00:00");
-  expect(stringifyDate("2022-06-08T09:00:00")).toBe("2022-06-08 09:00:00");
-  expect(stringifyDate("2022-06-08T15:00:00Z")).toBe("2022-06-08 15:00:00");
+  expect(stringifyDate(new Date("2022-06-08"))).toBe("2022-06-08 00:00:00");
+  expect(stringifyDate(new Date("2022-06-08T09:00:00"))).toBe(
+    "2022-06-08 09:00:00"
+  );
+  expect(stringifyDate(new Date("2022-06-08T15:00:00Z"))).toBe(
+    "2022-06-08 15:00:00"
+  );
 });
